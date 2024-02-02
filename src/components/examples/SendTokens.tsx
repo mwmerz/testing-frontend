@@ -38,14 +38,13 @@ export const SendTokens = () => {
     }
   }
 
+  // handle receiving the sendTokenMsg and posting it to the wallet
   useEffect(() => {
     const postToWallet = async () => {
       if (sendTokenMsg && shouldPost) {
-        setPollingResponse("")
         try {
           const post_response = await wallet.post(sendTokenMsg)
           console.log(post_response)
-          setPolling(true)
           setTxHash(post_response.txhash)
         } catch (postError) {
           console.error("Error posting to wallet:", postError)
@@ -58,9 +57,12 @@ export const SendTokens = () => {
     postToWallet()
   }, [sendTokenMsg, shouldPost, wallet])
 
+  // handle polling the transaction status and polling state
   useEffect(() => {
     const chainId = "phoenix-1"
     if (txHash) {
+      setPolling(true)
+      setPollingResponse("")
       pollTransactionAsync({ txhash: txHash, chainId: chainId })
         .then((response) => {
           console.log("Transaction successfully polled:", response)
