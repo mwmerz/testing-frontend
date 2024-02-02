@@ -12,12 +12,12 @@ export const SendTokens = () => {
   const { walletAddress } = useAppContext()
 
   const { sendTokensAsync, data: sendTokenMsg, error } = useSendTokens()
-  const { pollTransactionAsync } = usePollTransactionStatus()
+  const { pollTransactionAsync } = usePollTransactionStatus() // actually need
 
   const [shouldPost, setShouldPost] = useState(false)
   const [txHash, setTxHash] = useState("")
-  const [polling, setPolling] = useState(false)
-  const [pollingResponse, setPollingResponse] = useState("")
+  const [polling, setPolling] = useState(false) // actually need
+  const [pollingResponse, setPollingResponse] = useState("") // actually need
 
   const handleSendClick = async (
     to: string,
