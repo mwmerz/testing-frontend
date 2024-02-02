@@ -1,0 +1,11 @@
+@import "src/styles/reboot";
+
+html {
+  background: #dedede;
+}
+
+body {
+  background: linear-gradient(180deg, #dedede 0%, #ededed 100%);
+  padding: 8px;
+  min-height: 100vh
+}
