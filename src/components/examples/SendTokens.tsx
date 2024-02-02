@@ -11,13 +11,13 @@ export const SendTokens = () => {
   const wallet = useWallet()
   const { walletAddress } = useAppContext()
 
-  const { sendTokensAsync, data: sendTokenMsg, error } = useSendTokens()
+  const { sendTokensAsync, data: sendTokenMsg, error } = useSendTokens() // just an example of a tx. tx component/createtx does this
   const { pollTransactionAsync } = usePollTransactionStatus() // actually need
 
-  const [shouldPost, setShouldPost] = useState(false)
-  const [txHash, setTxHash] = useState("")
+  const [shouldPost, setShouldPost] = useState(false) // tx component handles this
+  const [txHash, setTxHash] = useState("") // actually need
   const [polling, setPolling] = useState(false) // actually need
-  const [pollingResponse, setPollingResponse] = useState("") // actually need
+  const [pollingResponse, setPollingResponse] = useState("") // feedback. growl or something
 
   const handleSendClick = async (
     to: string,
