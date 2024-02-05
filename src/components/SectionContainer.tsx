@@ -1,4 +1,4 @@
-import { ReactNode, useState, HTMLAttributes } from "react"
+import { ReactNode, useState, HTMLAttributes, MouseEvent } from "react"
 import classNames from "classnames/bind"
 import styles from "./SectionContainer.module.scss"
 
@@ -20,20 +20,23 @@ export const SectionContainer = ({
 }: SectionContainerProps) => {
   const [expanded, setExpanded] = useState(true)
 
+  const toggleExpansion = (e: MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault()
+    setExpanded((expanded) => !expanded)
+  }
+
   return (
     <div className={cx("section__wrapper")}>
       {expandable && (
-        <div
+        <button
           className={cx("expansion__container")}
-          onClick={(e) => {
-            e.preventDefault()
-            setExpanded((expanded) => !expanded)
-          }}
+          onClick={toggleExpansion}
+          aria-expanded={expanded}
         >
           <span>
-            {expanded ? "🔽" : "▶️"} {expansionTitle && expansionTitle}
+            {expanded ? "🔽" : "▶️"} {expansionTitle}
           </span>
-        </div>
+        </button>
       )}
       <div
         className={cx(

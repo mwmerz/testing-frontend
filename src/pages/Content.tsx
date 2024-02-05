@@ -19,7 +19,7 @@ export const Content = () => {
         >
           <TransactionStatus />
         </SectionContainer>
-        <SectionContainer background expandable expansionTitle={"Send Tokens"}>
+        <SectionContainer expandable expansionTitle={"Send Tokens"}>
           <SendTokens />
         </SectionContainer>
       </TransactionProvider>
