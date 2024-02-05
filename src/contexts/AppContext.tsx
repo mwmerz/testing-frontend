@@ -40,7 +40,6 @@ const AppStateProvider = ({
     if (connectedWallet && connectedWallet.network) {
       network = connectedWallet.network === "mainnet" ? "mainnet" : "testnet"
       const chainIdFromNetwork = getChainIdFromNetwork(network)
-
       setWalletAddress(connectedWallet.addresses?.[chainIdFromNetwork])
       setContractAddresses(contracts[chainIdFromNetwork])
       setChainId(chainIdFromNetwork)

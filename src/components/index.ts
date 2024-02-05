@@ -1,4 +1,5 @@
 export * from "./SectionContainer"
 export * from "./Navigation"
 export * from "./Button"
+export * from "./TransactionStatus"
 export * from "./examples"

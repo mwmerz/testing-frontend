@@ -8,9 +8,9 @@ interface ButtonProps extends HTMLAttributes<HTMLButtonElement> {
   children: ReactNode
 }
 
-export const Button = ({ children, ...props }: ButtonProps) => {
+export const Button = ({ children, className, ...props }: ButtonProps) => {
   return (
-    <button className={cx("button__container")} {...props}>
+    <button className={cx("button__container", className)} {...props}>
       {children}
     </button>
   )

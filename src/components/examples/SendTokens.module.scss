@@ -1,0 +1,54 @@
+.sendbox {
+  max-width: 600px; // Limiting width for better readability
+  margin: auto;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); // Soft shadow for depth
+  border-radius: 8px; // Rounded corners
+  background-color: #fff; // Light theme, consider dark mode adaptability
+}
+
+.input_container {
+  margin-bottom: 16px; // Space between input fields
+}
+
+.input_control {
+  width: 100%; // Full width to accommodate longer addresses
+  padding: 8px 12px; // Padding for comfort
+  border: 1px solid #ccc; // Subtle border
+  border-radius: 4px; // Consistency in rounding
+  font-size: 1rem; // Legible font size
+  &:focus {
+    border-color: #007bff; // Highlight on focus, consider variable for color
+    outline: none; // Remove default outline
+  }
+}
+
+
+
+.submit_button {
+  background-color: #007bff; // Primary action color
+  &:hover {
+    background-color: darken(#007bff, 10%); // Slight darken on hover
+  }
+}
+
+.reset_button {
+  background-color: #f8f9fa; // Neutral background
+  color: #212529; // Readable contrast
+  &:hover {
+    background-color: darken(#f8f9fa, 10%); // Slight darken on hover
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .sendbox {
+    padding: 10px; // Less padding on smaller screens
+  }
+
+  .submit_button,
+  .reset_button {
+    width: 100%; // Full width for easier access
+    margin: 8px 0; // Stack vertically with space
+  }
+}

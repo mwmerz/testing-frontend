@@ -1,118 +1,144 @@
-import { useState, useEffect } from "react"
-import { useWallet } from "@terra-money/wallet-kit"
-import {
-  useSendTokens,
-  usePollTransactionStatus,
-} from "@terra-money/terra-utils"
-import { useAppContext } from "contexts"
+import React, { useState, useEffect, useCallback, ChangeEvent } from "react"
+import { useSendTokens } from "@terra-money/terra-utils"
+import { useAppContext, useTransactionContext } from "contexts"
 import { Button } from "components"
 
-export const SendTokens = () => {
-  const wallet = useWallet()
-  const { walletAddress } = useAppContext()
+import styles from "./SendTokens.module.scss"
+import classNames from "classnames/bind"
 
-  const { sendTokensAsync, data: sendTokenMsg, error } = useSendTokens() // just an example of a tx. tx component/createtx does this
-  const { pollTransactionAsync } = usePollTransactionStatus() // actually need
+const cx = classNames.bind(styles)
 
-  const [shouldPost, setShouldPost] = useState(false) // tx component handles this
-  const [txHash, setTxHash] = useState("") // actually need
-  const [polling, setPolling] = useState(false) // actually need
-  const [pollingResponse, setPollingResponse] = useState("") // feedback. growl or something
+// Assuming these types are defined somewhere in your project
+interface SendTokensParams {
+  senderAddress: { address: string; chain: string }
+  recipientAddress: { address: string; chain: string }
+  amount: { denom: string; amount: string }[]
+}
 
-  const handleSendClick = async (
-    to: string,
-    from: string,
-    denom: string,
-    amount: number
-  ) => {
+interface AppContextType {
+  walletAddress: string
+}
+
+export const SendTokens: React.FC = () => {
+  const { walletAddress } = useAppContext() as AppContextType
+  const { updateMessage } = useTransactionContext()
+  const { sendTokensAsync, data } = useSendTokens()
+
+  const [sendDenom, setSendDenom] = useState<string>("uluna")
+  const [sendAmount, setSendAmount] = useState<number>(1)
+  const [recipientAddress, setRecipientAddress] = useState<string>(
+    walletAddress || ""
+  )
+  const [feedbackMessage, setFeedbackMessage] = useState<string>("")
+
+  useEffect(() => {
+    setRecipientAddress(walletAddress || "")
+  }, [walletAddress])
+
+  useEffect(() => {
+    if (data) {
+      console.log("running update message:", data)
+      updateMessage(data)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data])
+
+  const handleSendClick = useCallback(async () => {
+    if (!recipientAddress || sendAmount <= 0) {
+      setFeedbackMessage("Invalid recipient address or amount.")
+      return
+    }
+
     try {
       await sendTokensAsync({
-        senderAddress: { address: from, chain: "phoenix-1" },
-        recipientAddress: { address: to, chain: "phoenix-1" },
-        amount: [{ denom: denom, amount: amount.toString() }],
-      })
-      setShouldPost(true)
+        senderAddress: { address: walletAddress, chain: "phoenix-1" },
+        recipientAddress: { address: recipientAddress, chain: "phoenix-1" },
+        amount: [{ denom: sendDenom, amount: sendAmount.toString() }],
+      } as SendTokensParams)
     } catch (err) {
-      console.error("Error creating token send message:", err, error)
-      setShouldPost(false)
+      console.error("Error creating token send message:", err)
+      setFeedbackMessage("Failed to send tokens. Please try again.")
     }
+  }, [sendTokensAsync, walletAddress, recipientAddress, sendDenom, sendAmount])
+
+  const resetForm = () => {
+    setRecipientAddress(walletAddress)
+    setSendDenom("uluna")
+    setSendAmount(1)
+    setFeedbackMessage("")
   }
 
-  // handle receiving the sendTokenMsg and posting it to the wallet
-  useEffect(() => {
-    const postToWallet = async () => {
-      if (sendTokenMsg && shouldPost) {
-        try {
-          const post_response = await wallet.post(sendTokenMsg)
-          console.log(post_response)
-          setTxHash(post_response.txhash)
-        } catch (postError) {
-          console.error("Error posting to wallet:", postError)
-        } finally {
-          setShouldPost(false)
-        }
-      }
+  const handleInputChange =
+    <T extends string | number>(
+      setter: React.Dispatch<React.SetStateAction<T>>
+    ) =>
+    (event: ChangeEvent<HTMLInputElement>) => {
+      const value: string | number =
+        event.target.type === "number"
+          ? Number(event.target.value)
+          : event.target.value
+      setter(value as T)
     }
-
-    postToWallet()
-  }, [sendTokenMsg, shouldPost, wallet])
-
-  // handle polling the transaction status and polling state
-  useEffect(() => {
-    const chainId = "phoenix-1"
-    if (txHash) {
-      setPolling(true)
-      setPollingResponse("")
-      pollTransactionAsync({ txhash: txHash, chainId: chainId })
-        .then((response) => {
-          console.log("Transaction successfully polled:", response)
-          setPollingResponse(JSON.stringify(response))
-        })
-        .catch((pollError) => {
-          console.error("Error polling transaction status:", pollError)
-          setPollingResponse(JSON.stringify(pollError))
-        })
-        .finally(() => {
-          setPolling(false)
-        })
-    }
-  }, [txHash, pollTransactionAsync])
 
   return (
     <div>
-      <h1>Send Tokens</h1>
-      <div>From: {walletAddress}</div>
-      <div>
-        Polling:{" "}
-        {polling
-          ? "Posting Tx, waiting for confirm"
-          : "Polling done or not started.  use tx response for feedback."}
-      </div>
-      <div
-        style={{
-          height: 200,
-          overflow: "scroll",
-          padding: 8,
-          border: "1px solid #ededed",
-          margin: 8,
-        }}
-      >
-        Polling Response: {pollingResponse}
-      </div>
       <div style={{ display: "flex", gap: 8 }}>
-        <Button
-          onClick={() =>
-            handleSendClick(
-              "terra1u28fgu0p99eh9xc4623k6cw6qmfdnl9un23yxs",
-              "terra1u28fgu0p99eh9xc4623k6cw6qmfdnl9un23yxs",
-              "uluna",
-              1
-            )
-          }
-        >
-          Send 1 Luna to myself
-        </Button>
+        {walletAddress ? (
+          <div className={cx("sendbox")}>
+            <InputField
+              label="Recipient Address"
+              value={recipientAddress}
+              onChange={handleInputChange(setRecipientAddress)}
+            />
+            <InputField
+              label="Denomination"
+              value={sendDenom}
+              onChange={handleInputChange(setSendDenom)}
+            />
+            <InputField
+              type="number"
+              label="Amount"
+              value={sendAmount.toString()}
+              onChange={handleInputChange(setSendAmount)}
+            />
+            <div className={cx("submit_container")}>
+              <Button className={cx("submit_button")} onClick={handleSendClick}>
+                Send {sendAmount} {sendDenom} to {recipientAddress}
+              </Button>
+              <Button className={cx("reset_button")} onClick={resetForm}>
+                Reset
+              </Button>
+              {feedbackMessage && <p>{feedbackMessage}</p>}
+            </div>
+          </div>
+        ) : (
+          <p>Please connect your wallet to send tokens.</p>
+        )}
       </div>
     </div>
   )
 }
+
+interface InputFieldProps {
+  label: string
+  value: string
+  onChange: (event: ChangeEvent<HTMLInputElement>) => void
+  type?: string
+}
+
+const InputField: React.FC<InputFieldProps> = ({
+  label,
+  value,
+  onChange,
+  type = "text",
+}) => (
+  <div className={cx("input_container")}>
+    <label>{label}</label>
+    <input
+      className={cx("input_control")}
+      type={type}
+      value={value}
+      onChange={onChange}
+    />
+  </div>
+)
