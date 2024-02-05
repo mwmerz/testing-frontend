@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, ChangeEvent } from "react"
+import { Coin } from "@terra-money/feather.js"
 import { useSendTokens } from "@terra-money/terra-utils"
 import { useAppContext, useTransactionContext } from "contexts"
 import { Button } from "components"
@@ -8,11 +9,10 @@ import classNames from "classnames/bind"
 
 const cx = classNames.bind(styles)
 
-// Assuming these types are defined somewhere in your project
 interface SendTokensParams {
   senderAddress: { address: string; chain: string }
   recipientAddress: { address: string; chain: string }
-  amount: { denom: string; amount: string }[]
+  amount: Coin
 }
 
 interface AppContextType {
@@ -53,7 +53,7 @@ export const SendTokens: React.FC = () => {
       await sendTokensAsync({
         senderAddress: { address: walletAddress, chain: "phoenix-1" },
         recipientAddress: { address: recipientAddress, chain: "phoenix-1" },
-        amount: [{ denom: sendDenom, amount: sendAmount.toString() }],
+        amount: new Coin(sendDenom, sendAmount.toString()),
       } as SendTokensParams)
     } catch (err) {
       console.error("Error creating token send message:", err)
