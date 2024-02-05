@@ -12,14 +12,22 @@ export const Content = () => {
   return (
     <div className={styles.container}>
       <TransactionProvider>
-        <SectionContainer style={{ marginTop: 24 }}>
+        <SectionContainer
+          background
+          expandable
+          expansionTitle={"Transaction Status"}
+        >
           <TransactionStatus />
         </SectionContainer>
-        <SectionContainer style={{ marginTop: 24 }}>
+        <SectionContainer background expandable expansionTitle={"Send Tokens"}>
           <SendTokens />
         </SectionContainer>
       </TransactionProvider>
-      <SectionContainer style={{ marginTop: 24 }}>
+      <SectionContainer
+        background
+        expandable
+        expansionTitle={"Contract Queries"}
+      >
         <QueryContractDirect />
         <QueryContractWrapper />
       </SectionContainer>
