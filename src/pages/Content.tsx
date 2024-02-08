@@ -5,6 +5,7 @@ import {
   QueryContractWrapper,
   SendTokens,
   TransactionStatus,
+  BankBalances,
 } from "components"
 import styles from "./Content.module.scss"
 
@@ -21,6 +22,9 @@ export const Content = () => {
         </SectionContainer>
         <SectionContainer expandable expansionTitle={"Send Tokens"}>
           <SendTokens />
+        </SectionContainer>
+        <SectionContainer expandable expansionTitle={"Bank Balances"}>
+          <BankBalances />
         </SectionContainer>
       </TransactionProvider>
       <SectionContainer
